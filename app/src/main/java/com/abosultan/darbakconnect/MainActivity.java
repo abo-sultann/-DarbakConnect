@@ -16,6 +16,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
+    private static final String CAR_URL = "file:///android_asset/car.html";
     private WebView webView;
     private final Handler handler = new Handler();
     private int retries = 0;
@@ -42,23 +43,25 @@ public class MainActivity extends Activity {
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "ObsoleteSdkInt", "AllowFileAccess"})
     private void buildWebView() {
         webView = new WebView(this);
         setContentView(webView);
         webView.setBackgroundColor(0xFF020812);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
+        settings.setDomStorageEnabled(false);
         settings.setDatabaseEnabled(false);
-        settings.setAllowFileAccess(false);
-        settings.setAllowContentAccess(true);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(false);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
         settings.setTextZoom(100);
-        if (Build.VERSION.SDK_INT >= 21) settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        settings.setAllowFileAccessFromFileURLs(false);
+        settings.setAllowUniversalAccessFromFileURLs(true);
+        if (Build.VERSION.SDK_INT >= 21) settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -74,13 +77,13 @@ public class MainActivity extends Activity {
             @Override
             @SuppressWarnings("deprecation")
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                if (failingUrl != null && failingUrl.startsWith("http://127.0.0.1") && retries < 8) {
+                if (retries < 4) {
                     retries++;
-                    handler.postDelayed(() -> webView.loadUrl("http://127.0.0.1:8765/?car=1"), 650L);
+                    handler.postDelayed(() -> webView.loadUrl(CAR_URL), 700L);
                 }
             }
         });
-        handler.postDelayed(() -> webView.loadUrl("http://127.0.0.1:8765/?car=1"), 250L);
+        handler.postDelayed(() -> webView.loadUrl(CAR_URL), 300L);
     }
 
     private void enterImmersiveMode() {
