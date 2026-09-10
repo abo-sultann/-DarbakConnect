@@ -25,6 +25,7 @@ public class ConnectService extends Service {
             server = new LocalServer(getApplicationContext(), PORT);
             server.start(5000, false);
             DarbakStore.log(this, "system", "تم تشغيل دربك اتصال");
+            DarbakRuntime.markHealthy();
         } catch (Exception e) {
             DarbakStore.log(this, "error", "تعذر تشغيل الاتصال المحلي: " + e.getMessage());
             server = null;
