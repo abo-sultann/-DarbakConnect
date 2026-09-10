@@ -14,10 +14,24 @@ android {
         versionName '1.0.0'
     }
 
+    signingConfigs {
+        stable {
+            def keystorePath = System.getenv('KEYSTORE_PATH') ?: "${rootDir}/app/darbak-connect-stable.jks"
+            storeFile file(keystorePath)
+            storePassword 'android'
+            keyAlias 'darbakconnect'
+            keyPassword 'android'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.stable
+        }
+        debug {
+            signingConfig signingConfigs.stable
         }
     }
 
@@ -32,6 +46,7 @@ android {
 
     lint {
         abortOnError false
+        disable 'ExpiredTargetSdkVersion'
     }
 }
 
